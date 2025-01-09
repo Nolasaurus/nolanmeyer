@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            margin: 0 1rem;
+            text-decoration: none;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            padding: 2rem;
+        }
+        .education-page {
+            display: flex;
+            justify-content: space-between;
+        }
+        .image-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            width: 50%;
+        }
+        .image-column img {
+            width: 80%;
+            padding: 1rem;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="profile.html">Profile</a>
+        <a href="education.html">Education</a>
+    </nav>
+
+    <div id="profile" class="container">
+        <h1>Profile Page</h1>
+        <p>Welcome to the profile page!</p>
+    </div>
+
+    <div id="education" class="container education-page">
+        <div class="content">
+            <h1>Education Page</h1>
+            <p>Welcome to the education page!</p>
+        </div>
+        <div class="image-column">
+            <img src="image1.jpg" alt="Image 1">
+            <img src="image2.jpg" alt="Image 2">
+            <img src="image3.jpg" alt="Image 3">
+        </div>
+    </div>
+</body>
+</html>
