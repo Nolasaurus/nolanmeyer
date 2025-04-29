@@ -1,0 +1,136 @@
+Decision Tree (not flexible, bad with unseen data)
+Decision Tree Pruning (pre (simple) and post (complex))
+Random Forest
+Proximity Matrix -> Distance Matrix -> Heatmap
+Dimension Reduction
+MultiDimensional Scaling (MDS) plot (Metric vs Non-metric)
+Principal Coordinate Analysis(PCoA)
+Principal Component Analysis (PCA)
+Logic Symbols (and, or, not, xor, ... )
+Boostrap (not using the same data for every tree)
+Bootstrap + Aggregating (Bagging)
+Out-of-Bag Data
+Out-of-Bag Error
+Boosting
+Time Series
+LSTM
+RNN
+DNN
+CNN
+Activation Function
+Overfitting
+Bias
+Variance
+CoVariance Matrix
+Parameters
+Node
+Leaf
+Tree
+Pointer
+list comprehension
+dictionary comprehension
+Markov Chain
+MC Monte Carlo
+
+DSCI WEek 7
+Collaborative Filtering
+Natural Language Processing 
+Term Frequency 
+Inverse Document Frequency
+Content Based Filtering
+triangular encoding
+OHE
+Sentiment Analysis
+Word2vec algorithm
+Word meaning, dependency parsing, machine translation, question answering
+
+
+CSCI week 6
+Transfer Learning
+Feature Transfer
+Negative Transfer :(
+pre-trained model
+fine-tuning
+feature extraction
+"convolutional responses"
+Fully Convolutional Networks (FCNs) - An FCN replaces the fully connected layers with convolutional layers so that the model can work on images of varying sizes and produce segmentation maps instead of single labels.
+segmentation maps
+semantic segmentation
+instance segmentation
+Popular CNN architectures: (, SegNet, Mask R-CNN, FCN)
+VGG 19
+ResNet
+Residual Blocks
+U-net (used by Stable Diffusion?!) (designed for semantic segmentation)
+Encoder
+Decoder
+Skip Connection
+Cross-Entropy Loss
+Dice Loss (form of F1 score for segmentation tasks)
+Intersection over Union (IoU) aka Jaccard Index
+Pixel Accuracy
+Precision
+Recall
+Confusion Matrix
+Mean Average Precision
+Boundary F1 score (BFScore) - This metric evaluates the quality of object boundaries in segmentation. In tasks where the boundary details are crucial (e.g., medical imaging or autonomous driving), the BFScore evaluates how closely the predicted boundary aligns with the ground truth boundary
+Class Imbalance
+downsampling
+upsampling
+maxpool vs avg pool
+RoI Align - preserves spatial orientation of features and no lost data
+multi-task training
+meta algorithm
+
+CSCI Week 7
+feature pyramid networks (FPN)
+spatial pyramid pooling
+dense anchor boxes
+dynamic anchor boxes
+CIoU loss
+focal loss
+Information Bottleneck Principle 
+Reversible Functions 
+non-maximum suppression (NMS) 
+inference latency
+oriented object detection 
+Efficient Layer Aggregation Networks  (ELAN)
+R-ELAN
+
+Single Value Decomposition (SVD)
+Content Filtering
+Collaborative Filtering
+
+experiments: Synthetic Control
+
+aHash, dHash, pHash, and wHash
+
+Explicit Feedback vs. Implicit Feedback
+user-item rating matrix 
+Content-Based vs. Collaborative Filtering
+Hybrid Approach: LightFM
+
+
+Useful Python Libraries
+- numpy 
+- pathlib
+- pyenv or whatever for keys
+- os
+- math
+- shutil
+- logging
+- collections
+itertools
+functools
+tempfile
+
+Text Fragment Link
+
+
+Rule Of 40 (value creation metric): a simple financial framework that balances revenue growth versus profit margins.
+
+
+SaaS
+MAU
+cpm
+other website tracking acronyms
