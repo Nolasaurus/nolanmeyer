@@ -9,6 +9,7 @@
       justify-content: center;
       margin: 0;
       padding: 20px;
+      font-family: Georgia, serif;
     }
     .content {
       max-width: 800px;
@@ -18,11 +19,6 @@
 </head>
 <body>
   <div class="content">
-
-  
-<img src="20250425_155943.jpg">
-
-
 <h1 id="problem">Problem</h1>
 <ul>
   <li>Received a bunch of incense scents/flavors for Christmas</li>
@@ -53,6 +49,8 @@
 <ul>
   <li>Arrange in hexagon since there are 6 and the tubes are hexagons</li>
 </ul>
+Only a few critical dimensions are required to fully specify the face of the print.
+<img src="pics/cad_2d_sketch1.png" width="600" style="display: block; margin: auto;">
 
 <h1 id="problems">Problems</h1>
 <ul>
@@ -66,18 +64,28 @@
 </ul>
 
 <h1 id="blessing-in-disguise">Blessing in Disguise</h1>
+Original Design
+<img src="pics/og_design.png" width="600" style="display: block; margin: auto;">
 <ul>
   <li>After the print failure, while troubleshooting the extrusion problem, realized poor design choices and decided to redesign to save material/print time
     <ul>
       <li>Started with 5mm base plate, reduced to 3mm</li>
-      <li>Removed any parts that weren't holding the tubes</li>
+      <li>Removed any of the base that extends beyond the furthest edge of the tube holder walls</li>
+      <li>Removed any walls that weren't holding the tubes</li>
       <li>Made shorter 100mm → 75mm</li>
+      
     </ul>
   </li>
+  <br>
   <li>Re-running the first layer calibration helped me discover my Z axis adjustment was off by 0.1mm, and changing from -0.850 → -0.750 improved my bed adhesion and first layer smoothness 👍</li>
+  <br>
+  Bottom: before, Top: after
+  <br>
+  <img src="pics/before_and_after_z_adjust.jpg" width="600" style="display: block; margin: auto;">
 </ul>
 
 <h1 id="tests">Tests</h1>
+<img src="pics/cropped_tolerance_test_fits_.jpg" width="800">
 <ul>
   <li>Test tolerance to hexagon size for good fit
     <ul>
@@ -91,7 +99,34 @@
     </ul>
   </li>
 </ul>
+<br>
+Print in progress
+<br>
+<img src="pics/base_print_in_progress.jpg" width="600" style="display: block; margin: auto;">
+<br>
+Finished Print
+<br>
+<img src="pics/finished_base.jpg" width="600" style="display: block; margin: auto;">
+<br>
+They fit!
+<br>
+<div style="text-align: center;">
+  <img src="pics/test_fit_base.jpg" width="300" style="display: inline-block; margin: 10px;">
+  <img src="pics/test_fit_base_all_tubes.jpg" width="300" style="display: inline-block; margin: 10px;">
+</div>
+<h1 id="cap">Print lid/cap</h1>
+The cap is the same as the bottom except without the circular base.
+<br>
+<img src="pics/cap_finished_print.jpg" width="600" style="display: block; margin: auto;">
+<br>
+I removed the loose flaps from the tube, thinking it would improve the fit. It did a teensy bit but came with the massive downside of easily frayed cardboard tubes.
+<div style="text-align: center;">
+  <img src="pics/cap_in_place.jpg" width="300" style="display: inline-block; margin: 10px;">
+  <img src="pics/frayed_tubes.jpg" width="300" style="display: inline-block; margin: 10px;">
+</div>
 
+
+<br>
 <h1 id="next-iterations">Next Iterations</h1>
 <ul>
   <li>Cap fitment
