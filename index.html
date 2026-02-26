@@ -1,2 +1,313 @@
-<a href="https://nolasaurus.github.io/nolanmeyer/incense_holder.html">Like this one!</a>
-<a href="https://nolasaurus.github.io/nolanmeyer/osrs_plots.html">Or this one</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nolan Meyer</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --fg: #e8e8e8;
+    --accent: #c8f060;
+    --muted: #555;
+    --border: #222;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  header {
+    padding: 48px 48px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .name {
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+    color: var(--fg);
+  }
+
+  .name span { color: var(--accent); }
+
+  .links {
+    margin-top: 8px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    transition: color .15s;
+  }
+  .links a:hover { color: var(--accent); }
+
+  /* ── Tabs ── */
+  nav {
+    padding: 0 48px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0;
+  }
+
+  nav button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 14px 20px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color .15s, border-color .15s;
+  }
+
+  nav button:hover { color: var(--fg); }
+  nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── Main content ── */
+  main {
+    padding: 48px;
+    max-width: 860px;
+  }
+
+  .tab-panel { display: none; animation: fadeIn .2s ease; }
+  .tab-panel.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  /* ── Section title ── */
+  .section-title {
+    font-size: 11px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  /* ── Card grid ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .card {
+    background: var(--bg);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: background .15s;
+  }
+
+  .card:hover { background: #141414; }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fg);
+  }
+
+  .card-desc {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height: 1.6;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .tag {
+    font-size: 10px;
+    letter-spacing: .06em;
+    color: var(--accent);
+    border: 1px solid #2a3a10;
+    padding: 2px 7px;
+    text-transform: uppercase;
+  }
+
+  .card-link {
+    margin-top: auto;
+    font-size: 11px;
+    color: var(--muted);
+    text-decoration: none;
+    padding-top: 12px;
+    transition: color .15s;
+  }
+  .card-link:hover { color: var(--accent); }
+  .card-link::before { content: "→ "; }
+
+  /* ── Timeline (education) ── */
+  .timeline { list-style: none; }
+
+  .timeline li {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 24px;
+  }
+
+  .timeline li:last-child { border-bottom: none; }
+
+  .tl-date { font-size: 11px; color: var(--muted); padding-top: 2px; }
+  .tl-title { font-size: 14px; font-weight: 500; }
+  .tl-sub { font-size: 12px; color: var(--muted); font-family: 'IBM Plex Sans', sans-serif; margin-top: 4px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    header, nav, main { padding-left: 20px; padding-right: 20px; }
+    .timeline li { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="name">Nolan<span>.</span>Meyer</div>
+  <div class="links">
+    <a href="https://github.com/Nolasaurus" target="_blank">github.com/Nolasaurus</a>
+    <!-- ADD MORE LINKS HERE: <a href="mailto:you@email.com">email</a> -->
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('projects')">Projects</button>
+  <button onclick="showTab('printing')">3D Printing</button>
+  <button onclick="showTab('education')">Education</button>
+</nav>
+
+<main>
+
+  <!-- ═══════════════════════════════
+       PROJECTS TAB
+       To add a project: copy a <div class="card"> block and fill in the fields.
+  ════════════════════════════════ -->
+  <div id="tab-projects" class="tab-panel active">
+    <div class="section-title">Projects</div>
+
+    <div class="card-grid">
+
+      <div class="card">
+        <div class="card-title">nolanmeyer</div>
+        <div class="card-desc">Personal website and portfolio repository.</div>
+        <div class="card-tags">
+          <span class="tag">Python</span>
+        </div>
+        <a class="card-link" href="https://github.com/Nolasaurus/nolanmeyer" target="_blank">View on GitHub</a>
+      </div>
+
+      <!-- ── ADD PROJECT BELOW ──
+      <div class="card">
+        <div class="card-title">Project Name</div>
+        <div class="card-desc">Short description of what it does.</div>
+        <div class="card-tags">
+          <span class="tag">PyTorch</span>
+          <span class="tag">Python</span>
+        </div>
+        <a class="card-link" href="https://github.com/..." target="_blank">View on GitHub</a>
+      </div>
+      ── END ADD PROJECT ── -->
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       3D PRINTING TAB
+       To add a print: copy a <div class="card"> block.
+  ════════════════════════════════ -->
+  <div id="tab-printing" class="tab-panel">
+    <div class="section-title">3D Printing</div>
+
+    <div class="card-grid">
+
+      <div class="card">
+        <div class="card-title">Coming soon</div>
+        <div class="card-desc">Add your prints here.</div>
+        <div class="card-tags">
+          <span class="tag">FDM</span>
+        </div>
+      </div>
+
+      <!-- ── ADD PRINT BELOW ──
+      <div class="card">
+        <div class="card-title">Print Name</div>
+        <div class="card-desc">What it is, how it was made.</div>
+        <div class="card-tags">
+          <span class="tag">PLA</span>
+        </div>
+        <a class="card-link" href="https://www.printables.com/..." target="_blank">View on Printables</a>
+      </div>
+      ── END ADD PRINT ── -->
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       EDUCATION TAB
+       To add an entry: copy a <li> block.
+  ════════════════════════════════ -->
+  <div id="tab-education" class="tab-panel">
+    <div class="section-title">Education</div>
+
+    <ul class="timeline">
+
+      <li>
+        <span class="tl-date">2019 — 2023</span>
+        <div>
+          <div class="tl-title">Your Degree / Program</div>
+          <div class="tl-sub">University Name</div>
+        </div>
+      </li>
+
+      <!-- ── ADD EDUCATION BELOW ──
+      <li>
+        <span class="tl-date">YYYY — YYYY</span>
+        <div>
+          <div class="tl-title">Degree or Certificate</div>
+          <div class="tl-sub">Institution · Location</div>
+        </div>
+      </li>
+      ── END ADD EDUCATION ── -->
+
+    </ul>
+  </div>
+
+</main>
+
+<script>
+  function showTab(id) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
