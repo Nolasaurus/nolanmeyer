@@ -13,8 +13,10 @@
     --muted: #555;
     --border: #222;
     --warn: #f0b060;
-    --bad: #f06060;
+    --bad:  #f06060;
     --good: #60f0a0;
+    --bar-h: 16px;       /* controlled by slider */
+    --hist-w: 200px;     /* histogram column width */
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -43,18 +45,15 @@
   .name a { color: inherit; text-decoration: none; }
 
   .links { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 8px; }
-  .links a {
-    color: var(--muted); text-decoration: none;
-    font-size: 12px; transition: color .15s;
-  }
+  .links a { color: var(--muted); text-decoration: none; font-size: 12px; transition: color .15s; }
   .links a:hover { color: var(--accent); }
 
   .header-right { text-align: right; font-size: 11px; color: var(--muted); }
-  .header-right .status { color: var(--accent); }
+  .header-right .status       { color: var(--accent); }
   .header-right .status.loading { color: var(--warn); }
-  .header-right .status.error { color: var(--bad); }
+  .header-right .status.error   { color: var(--bad); }
 
-  main { padding: 48px; max-width: 1100px; }
+  main { padding: 48px; max-width: 1200px; }
 
   .section-title {
     font-size: 11px; letter-spacing: .15em;
@@ -62,11 +61,11 @@
     margin-bottom: 20px;
   }
 
-  /* ── refresh button ── */
+  /* ── controls bar ── */
   .controls {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 24px;
     margin-bottom: 28px;
     flex-wrap: wrap;
   }
@@ -80,82 +79,147 @@
     padding: 6px 14px;
     cursor: pointer;
     transition: border-color .15s, color .15s;
+    flex-shrink: 0;
   }
   button.refresh:hover { border-color: var(--accent); color: var(--accent); }
   button.refresh:disabled { opacity: .4; cursor: default; }
 
+  .height-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .height-control label { white-space: nowrap; }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    background: var(--border);
+    height: 3px;
+    border-radius: 2px;
+    width: 140px;
+    cursor: pointer;
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+  }
+
+  input[type="number"].bar-num {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--fg);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    width: 52px;
+    padding: 2px 6px;
+    text-align: center;
+    -moz-appearance: textfield;
+  }
+  input[type="number"].bar-num::-webkit-inner-spin-button,
+  input[type="number"].bar-num::-webkit-outer-spin-button { -webkit-appearance: none; }
+  input[type="number"].bar-num:focus { outline: 1px solid var(--muted); }
+
   .sort-hint { font-size: 11px; color: var(--muted); }
 
   /* ── table ── */
-  .table-wrap {
-    border: 1px solid var(--border);
-    overflow-x: auto;
-  }
+  .table-wrap { border: 1px solid var(--border); overflow-x: auto; }
 
   table { width: 100%; border-collapse: collapse; }
 
   thead th {
     font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
-    color: var(--muted); text-align: left; padding: 12px 16px;
+    color: var(--muted); text-align: left; padding: 12px 14px;
     border-bottom: 1px solid var(--border);
     white-space: nowrap; cursor: pointer; user-select: none;
     transition: color .15s;
+    vertical-align: bottom;
   }
   thead th:hover { color: var(--fg); }
   thead th.sorted { color: var(--accent); }
   thead th.sorted::after { content: " ▾"; }
   thead th.sorted.asc::after { content: " ▴"; }
   thead th.num { text-align: right; }
+  thead th.hist-col { width: var(--hist-w); min-width: 140px; }
 
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background .12s;
-  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
   tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: #141414; }
+  tbody tr:hover { background: #111; }
 
-  td { padding: 14px 16px; white-space: nowrap; }
+  td { padding: 12px 14px; white-space: nowrap; vertical-align: middle; }
   td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.hist-cell {
+    vertical-align: top;
+    padding: 10px 14px;
+    width: var(--hist-w);
+    min-width: 140px;
+  }
+
+  .price-label {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    display: block;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* histogram SVG wrapper */
+  .hist-svg { display: block; width: 100%; overflow: visible; }
 
   .lvl-badge {
-    font-size: 10px; color: var(--muted); border: 1px solid var(--border);
-    padding: 1px 6px; margin-right: 6px;
+    font-size: 10px; color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
   }
 
-  .gps {
-    font-weight: 500;
-  }
-  .gps.high   { color: var(--good); }
-  .gps.mid    { color: var(--accent); }
-  .gps.low    { color: var(--muted); }
+  .gps { font-weight: 500; }
+  .gps.high { color: var(--good); }
+  .gps.mid  { color: var(--accent); }
+  .gps.low  { color: var(--muted); }
 
-  .vol {
-    font-size: 12px;
-  }
+  .vol { font-size: 12px; }
   .vol.thin   { color: var(--bad); }
   .vol.ok     { color: var(--warn); }
   .vol.liquid { color: var(--good); }
 
-  .spread { font-size: 12px; color: var(--muted); }
+  .spread { font-size: 12px; }
   .spread.wide { color: var(--warn); }
 
   /* ── skeleton loader ── */
-  .skeleton td { color: transparent; background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%); background-size: 400% 100%; animation: shimmer 1.4s infinite; border-radius: 2px; }
+  .skeleton td {
+    color: transparent;
+    background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+    background-size: 400% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 2px;
+  }
   @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
 
   .error-banner {
     padding: 16px; border: 1px solid #3a2020;
-    color: var(--bad); font-size: 12px; margin-bottom: 24px;
-    display: none;
+    color: var(--bad); font-size: 12px; margin-bottom: 24px; display: none;
   }
   .error-banner.visible { display: block; }
 
   .footnote {
     font-size: 11px; color: var(--muted);
-    margin-top: 28px; line-height: 1.8;
+    margin-top: 28px; line-height: 1.9;
   }
+  .footnote a { color: var(--muted); }
 
-  @media (max-width: 600px) {
+  @media (max-width: 700px) {
     header, main { padding-left: 20px; padding-right: 20px; }
     header { flex-direction: column; align-items: flex-start; }
     .header-right { text-align: left; }
@@ -166,7 +230,7 @@
 
 <header>
   <div>
-    <div class="name"><a href="/">Nolan<span>.</span>Meyer</a></div>
+    <div class="name"><a href="index.html">Nolan<span>.</span>Meyer</a></div>
     <div class="links">
       <a href="index.html">← home</a>
       <a href="https://github.com/Nolasaurus/nolanmeyer" target="_blank">github</a>
@@ -180,11 +244,19 @@
 </header>
 
 <main>
-  <div class="section-title">Divine Potion Conversions — Live Prices</div>
+  <div class="section-title">Divine Potion Conversions — Live Prices + 7-Day History</div>
 
   <div class="controls">
-    <button class="refresh" id="refresh-btn" onclick="loadPrices()">↻ refresh prices</button>
-    <span class="sort-hint">click any column header to sort</span>
+    <button class="refresh" id="refresh-btn" onclick="loadAll()">↻ refresh</button>
+
+    <div class="height-control">
+      <label for="bar-slider">bar height</label>
+      <input type="range" id="bar-slider" min="6" max="40" value="16">
+      <input type="number" class="bar-num" id="bar-num" min="6" max="40" value="16">
+      <span>px</span>
+    </div>
+
+    <span class="sort-hint">click column header to sort</span>
   </div>
 
   <div class="error-banner" id="error-banner"></div>
@@ -194,10 +266,10 @@
       <thead>
         <tr>
           <th onclick="sortBy('level')">Herb</th>
-          <th onclick="sortBy('input')">Input Potion</th>
-          <th onclick="sortBy('inputPrice')" class="num">In (gp)</th>
+          <th onclick="sortBy('input')">Input</th>
+          <th class="hist-col" onclick="sortBy('inputPrice')">In price (7d)</th>
           <th onclick="sortBy('output')">Output</th>
-          <th onclick="sortBy('outputPrice')" class="num">Out (gp)</th>
+          <th class="hist-col" onclick="sortBy('outputPrice')">Out price (7d)</th>
           <th onclick="sortBy('spread')" class="num">Spread</th>
           <th onclick="sortBy('profit')" class="num">Profit/pot</th>
           <th onclick="sortBy('gps')" class="num sorted">GP/Shard</th>
@@ -205,118 +277,187 @@
         </tr>
       </thead>
       <tbody id="table-body">
-        <!-- skeleton rows while loading -->
-        <tr class="skeleton"><td>70</td><td>Super attack(4)</td><td class="num">——</td><td>Divine super attack(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
-        <tr class="skeleton"><td>70</td><td>Super strength(4)</td><td class="num">——</td><td>Divine super strength(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
-        <tr class="skeleton"><td>70</td><td>Super defence(4)</td><td class="num">——</td><td>Divine super defence(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
-        <tr class="skeleton"><td>74</td><td>Ranging potion(4)</td><td class="num">——</td><td>Divine ranging potion(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
-        <tr class="skeleton"><td>78</td><td>Magic potion(4)</td><td class="num">——</td><td>Divine magic potion(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
-        <tr class="skeleton"><td>86</td><td>Bastion potion(4)</td><td class="num">——</td><td>Divine bastion potion(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
-        <tr class="skeleton"><td>86</td><td>Battlemage potion(4)</td><td class="num">——</td><td>Divine battlemage potion(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
-        <tr class="skeleton"><td>97</td><td>Super combat potion(4)</td><td class="num">——</td><td>Divine super combat potion(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="footnote">
-    Prices: mid of insta-buy/sell from <a href="https://prices.runescape.wiki" target="_blank" style="color:var(--muted)">prices.runescape.wiki</a>.
-    Volume: 1h trade count for output item. Shards per conversion: 0.4.
+    Prices: mid of insta-buy/sell from <a href="https://prices.runescape.wiki" target="_blank">prices.runescape.wiki</a>.
+    Histograms: daily high/low range over last 7 days (oldest top → newest bottom). Dashed line = current mid price.
+    Volume: 1h trade count on output item.
+    Shards per conversion: 0.4.
     <br>
-    Vol flags: <span style="color:var(--bad)">red &lt; 50</span> · <span style="color:var(--warn)">amber 50–500</span> · <span style="color:var(--good)">green &gt; 500</span>.
-    Spread flag: <span style="color:var(--warn)">amber if (high−low)/mid &gt; 5%</span>.
+    Vol: <span style="color:var(--bad)">red &lt;50</span> ·
+         <span style="color:var(--warn)">amber 50–500</span> ·
+         <span style="color:var(--good)">green &gt;500</span>.
+    Spread flag: <span style="color:var(--warn)">amber &gt;5%</span> bid/ask spread.
   </div>
 </main>
 
 <script>
 const CONVERSIONS = [
-  { level: 70,  input: "Super attack(4)",        inputId: 2436,  output: "Divine super attack(4)",       outputId: 23697, shards: 0.4 },
-  { level: 70,  input: "Super strength(4)",      inputId: 2440,  output: "Divine super strength(4)",     outputId: 23709, shards: 0.4 },
-  { level: 70,  input: "Super defence(4)",       inputId: 2442,  output: "Divine super defence(4)",      outputId: 23721, shards: 0.4 },
-  { level: 74,  input: "Ranging potion(4)",      inputId: 2444,  output: "Divine ranging potion(4)",     outputId: 23733, shards: 0.4 },
-  { level: 78,  input: "Magic potion(4)",        inputId: 3040,  output: "Divine magic potion(4)",       outputId: 23745, shards: 0.4 },
-  { level: 86,  input: "Bastion potion(4)",      inputId: 22461, output: "Divine bastion potion(4)",     outputId: 24635, shards: 0.4 },
-  { level: 86,  input: "Battlemage potion(4)",   inputId: 22443, output: "Divine battlemage potion(4)",  outputId: 24623, shards: 0.4 },
-  { level: 97,  input: "Super combat potion(4)", inputId: 12695, output: "Divine super combat potion(4)",outputId: 23685, shards: 0.4 },
+  { level: 70, input: "Super attack(4)",        inputId: 2436,  output: "Divine super attack(4)",        outputId: 23697, shards: 0.4 },
+  { level: 70, input: "Super strength(4)",      inputId: 2440,  output: "Divine super strength(4)",      outputId: 23709, shards: 0.4 },
+  { level: 70, input: "Super defence(4)",       inputId: 2442,  output: "Divine super defence(4)",       outputId: 23721, shards: 0.4 },
+  { level: 74, input: "Ranging potion(4)",      inputId: 2444,  output: "Divine ranging potion(4)",      outputId: 23733, shards: 0.4 },
+  { level: 78, input: "Magic potion(4)",        inputId: 3040,  output: "Divine magic potion(4)",        outputId: 23745, shards: 0.4 },
+  { level: 86, input: "Bastion potion(4)",      inputId: 22461, output: "Divine bastion potion(4)",      outputId: 24635, shards: 0.4 },
+  { level: 86, input: "Battlemage potion(4)",   inputId: 22443, output: "Divine battlemage potion(4)",   outputId: 24623, shards: 0.4 },
+  { level: 97, input: "Super combat potion(4)", inputId: 12695, output: "Divine super combat potion(4)", outputId: 23685, shards: 0.4 },
 ];
 
-const API = "https://prices.runescape.wiki/api/v1/osrs";
-const HEADERS = { "User-Agent": "crystal-shard-dashboard/1.0 (nolasaurus.github.io)" };
-const RATE_MS = 210; // ~4.7 req/s, safely under 5/s
+const API      = "https://prices.runescape.wiki/api/v1/osrs";
+const HDRS     = { "User-Agent": "crystal-shard-dashboard/1.0 (nolasaurus.github.io)" };
+const RATE_MS  = 210;
 
 let currentSort = { key: "gps", asc: false };
-let tableData = [];
+let tableData   = [];
+let barH        = 16;   // px per day bar, synced with slider
 
+// ── Slider / number input sync ──────────────────────────────────────────────
+const slider  = document.getElementById("bar-slider");
+const numInput = document.getElementById("bar-num");
+
+function setBarH(val) {
+  barH = Math.max(6, Math.min(40, parseInt(val) || 16));
+  slider.value  = barH;
+  numInput.value = barH;
+  document.documentElement.style.setProperty("--bar-h", barH + "px");
+  if (tableData.length) renderTable();
+}
+
+slider.addEventListener("input",  () => setBarH(slider.value));
+numInput.addEventListener("change", () => setBarH(numInput.value));
+numInput.addEventListener("keydown", e => { if (e.key === "Enter") setBarH(numInput.value); });
+
+// ── API helpers ──────────────────────────────────────────────────────────────
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-async function fetchWithDelay(url, delayBefore = 0) {
+async function apiFetch(path, delayBefore = 0) {
   if (delayBefore) await sleep(delayBefore);
-  const r = await fetch(url, { headers: HEADERS });
-  if (!r.ok) throw new Error(`HTTP ${r.status} for ${url}`);
+  const r = await fetch(API + path, { headers: HDRS });
+  if (!r.ok) throw new Error(`HTTP ${r.status}: ${path}`);
   return r.json();
 }
 
-function mid(entry) {
-  const h = entry?.high ?? entry?.avgHighPrice ?? null;
-  const l = entry?.low  ?? entry?.avgLowPrice  ?? null;
+function mid(e) {
+  const h = e?.high ?? e?.avgHighPrice ?? null;
+  const l = e?.low  ?? e?.avgLowPrice  ?? null;
   if (h !== null && l !== null) return (h + l) / 2;
   return h ?? l ?? null;
 }
 
-function spreadPct(entry) {
-  const h = entry?.high ?? null;
-  const l = entry?.low  ?? null;
+function spreadPct(e) {
+  const h = e?.high ?? null, l = e?.low ?? null;
   if (h === null || l === null || h + l === 0) return null;
   return (h - l) / ((h + l) / 2) * 100;
 }
 
-function fmt(n) {
-  if (n === null || n === undefined) return "—";
-  return Math.round(n).toLocaleString();
+// ── Histogram renderer ───────────────────────────────────────────────────────
+// series: [{avgHighPrice, avgLowPrice, timestamp}, ...] last 7 days oldest→newest
+// currentMid: current live mid price (drawn as dashed vertical line)
+function renderHistogram(series, currentMid) {
+  if (!series || !series.length) {
+    return `<span style="color:var(--muted);font-size:11px">no data</span>`;
+  }
+
+  const days = series.slice(-7);
+  const allP = days.flatMap(d => [d.avgHighPrice, d.avgLowPrice].filter(v => v != null));
+  if (!allP.length) return `<span style="color:var(--muted);font-size:11px">no data</span>`;
+
+  // include current mid in the x-scale so the dashed line is never clipped
+  const allPlusMid = currentMid != null ? [...allP, currentMid] : allP;
+  const minP = Math.min(...allPlusMid);
+  const maxP = Math.max(...allPlusMid);
+  const span = maxP - minP || 1;
+
+  const gap     = 2;
+  const bh      = barH;           // bar height in px
+  const rowH    = bh + gap;       // row pitch
+  const totalH  = days.length * rowH - gap;
+  const W       = 200;            // SVG logical width
+  const PAD_L   = 2;
+  const PAD_R   = 2;
+  const innerW  = W - PAD_L - PAD_R;
+
+  const sx = p => PAD_L + ((p - minP) / span) * innerW;
+
+  // bars: oldest at top (index 0), newest at bottom
+  const bars = days.map((d, i) => {
+    const hi  = d.avgHighPrice ?? null;
+    const lo  = d.avgLowPrice  ?? null;
+    if (hi === null && lo === null) return "";
+
+    const x1  = sx(lo ?? hi);
+    const x2  = sx(hi ?? lo);
+    const y   = i * rowH;
+    const w   = Math.max(x2 - x1, 1);
+    const opacity = 0.45 + (i / Math.max(days.length - 1, 1)) * 0.45; // fade older bars
+
+    // tooltip
+    const loFmt = lo != null ? lo.toLocaleString() : "—";
+    const hiFmt = hi != null ? hi.toLocaleString() : "—";
+    const ts    = d.timestamp ? new Date(d.timestamp * 1000).toLocaleDateString(undefined, {month:"short",day:"numeric"}) : "";
+    const title = `${ts}: low ${loFmt} / high ${hiFmt}`;
+
+    return `<rect x="${x1.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="${bh}"
+      fill="var(--accent)" opacity="${opacity.toFixed(2)}" rx="1">
+      <title>${title}</title></rect>`;
+  }).join("\n");
+
+  // current mid price — dashed vertical line
+  const midLine = currentMid != null
+    ? `<line x1="${sx(currentMid).toFixed(1)}" y1="0"
+              x2="${sx(currentMid).toFixed(1)}" y2="${totalH}"
+              stroke="var(--fg)" stroke-width="1"
+              stroke-dasharray="2,2" opacity="0.7">
+         <title>current mid: ${Math.round(currentMid).toLocaleString()}</title>
+       </line>`
+    : "";
+
+  return `<svg class="hist-svg" viewBox="0 0 ${W} ${totalH}"
+    height="${totalH}" style="width:100%;min-width:80px">
+    ${bars}
+    ${midLine}
+  </svg>`;
 }
 
-function gpsClass(gps) {
-  if (gps === null) return "";
-  if (gps >= 12000) return "high";
-  if (gps >= 6000)  return "mid";
-  return "low";
-}
-
-function volClass(vol) {
-  if (vol === null) return "";
-  if (vol < 50)   return "thin";
-  if (vol < 500)  return "ok";
-  return "liquid";
-}
-
-async function loadPrices() {
-  const btn = document.getElementById("refresh-btn");
+// ── Main data fetch ──────────────────────────────────────────────────────────
+async function loadAll() {
+  const btn     = document.getElementById("refresh-btn");
   const statusEl = document.getElementById("status");
-  const errorEl = document.getElementById("error-banner");
+  const errorEl  = document.getElementById("error-banner");
 
   btn.disabled = true;
   statusEl.textContent = "loading…";
-  statusEl.className = "status loading";
+  statusEl.className   = "status loading";
   errorEl.classList.remove("visible");
   renderSkeleton();
 
   try {
-    const allIds = CONVERSIONS.flatMap(c => [c.inputId, c.outputId]);
-    const prices = {};
+    const allIds  = CONVERSIONS.flatMap(c => [c.inputId, c.outputId]);
+    const prices  = {};
     const volumes = {};
+    const series  = {};
 
-    // latest prices — sequential to respect rate limit
+    const cutoff7d = Date.now() / 1000 - 7 * 86400;
+
+    // fetch latest price + 1h volume + 7d timeseries for each item sequentially
     for (let i = 0; i < allIds.length; i++) {
-      const id = allIds[i];
+      const id    = allIds[i];
       const delay = i === 0 ? 0 : RATE_MS;
-      const json = await fetchWithDelay(`${API}/latest?id=${id}`, delay);
-      prices[id] = json.data?.[String(id)] ?? {};
-    }
 
-    // 1h volumes — sequential
-    for (let i = 0; i < allIds.length; i++) {
-      const id = allIds[i];
-      const json = await fetchWithDelay(`${API}/1h?id=${id}`, RATE_MS);
-      volumes[id] = json.data?.[String(id)] ?? {};
+      // latest
+      const latestJson = await apiFetch(`/latest?id=${id}`, delay);
+      prices[id] = latestJson.data?.[String(id)] ?? {};
+
+      // 1h volume
+      const volJson = await apiFetch(`/1h?id=${id}`, RATE_MS);
+      volumes[id]   = volJson.data?.[String(id)] ?? {};
+
+      // 7d timeseries (24h steps)
+      const tsJson = await apiFetch(`/timeseries?timestep=24h&id=${id}`, RATE_MS);
+      series[id]   = (tsJson.data ?? []).filter(d => d.timestamp >= cutoff7d);
     }
 
     tableData = CONVERSIONS.map(c => {
@@ -326,38 +467,35 @@ async function loadPrices() {
 
       const inMid  = mid(inP);
       const outMid = mid(outP);
-      const profit = (inMid !== null && outMid !== null) ? outMid - inMid : null;
-      const gps    = profit !== null ? profit / c.shards : null;
+      const profit = (inMid != null && outMid != null) ? outMid - inMid : null;
+      const gps    = profit != null ? profit / c.shards : null;
       const vol    = (outV.highPriceVolume ?? 0) + (outV.lowPriceVolume ?? 0);
       const sp     = spreadPct(outP);
 
       return {
         level: c.level,
         input: c.input,
+        inputId: c.inputId,
         inputPrice: inMid,
-        inputHigh: inP.high ?? null,
-        inputLow:  inP.low  ?? null,
+        inputSeries: series[c.inputId] ?? [],
         output: c.output,
+        outputId: c.outputId,
         outputPrice: outMid,
-        outputHigh: outP.high ?? null,
-        outputLow:  outP.low  ?? null,
+        outputSeries: series[c.outputId] ?? [],
         shards: c.shards,
-        profit,
-        gps,
-        vol,
-        spread: sp,
+        profit, gps, vol, spread: sp,
       };
     });
 
     renderTable();
     statusEl.textContent = "live";
-    statusEl.className = "status";
+    statusEl.className   = "status";
     document.getElementById("last-updated").textContent = new Date().toLocaleTimeString();
 
   } catch (err) {
     statusEl.textContent = "error";
-    statusEl.className = "status error";
-    errorEl.textContent = "Failed to fetch prices: " + err.message;
+    statusEl.className   = "status error";
+    errorEl.textContent  = "Failed to fetch prices: " + err.message;
     errorEl.classList.add("visible");
     console.error(err);
   } finally {
@@ -365,22 +503,19 @@ async function loadPrices() {
   }
 }
 
+// ── Table render ─────────────────────────────────────────────────────────────
 function sortBy(key) {
-  if (currentSort.key === key) {
-    currentSort.asc = !currentSort.asc;
-  } else {
-    currentSort.key = key;
-    currentSort.asc = key === "level" || key === "input" || key === "output";
-  }
+  currentSort = {
+    key,
+    asc: currentSort.key === key ? !currentSort.asc
+                                 : (key === "level" || key === "input" || key === "output"),
+  };
   updateSortHeaders();
   renderTable();
 }
 
 function updateSortHeaders() {
-  const keyMap = {
-    level: 0, input: 1, inputPrice: 2, output: 3,
-    outputPrice: 4, spread: 5, profit: 6, gps: 7, vol: 8
-  };
+  const keyMap = { level:0, input:1, inputPrice:2, output:3, outputPrice:4, spread:5, profit:6, gps:7, vol:8 };
   document.querySelectorAll("thead th").forEach((th, i) => {
     th.classList.remove("sorted", "asc");
     if (i === keyMap[currentSort.key]) {
@@ -390,13 +525,38 @@ function updateSortHeaders() {
   });
 }
 
+function fmt(n) {
+  if (n == null) return "—";
+  return Math.round(n).toLocaleString();
+}
+
+function gpsClass(g) {
+  if (g == null)   return "";
+  if (g >= 12000)  return "high";
+  if (g >= 6000)   return "mid";
+  return "low";
+}
+
+function volClass(v) {
+  if (v == null)  return "";
+  if (v < 50)     return "thin";
+  if (v < 500)    return "ok";
+  return "liquid";
+}
+
 function renderSkeleton() {
   const tbody = document.getElementById("table-body");
   tbody.innerHTML = CONVERSIONS.map(c => `
     <tr class="skeleton">
-      <td>${c.level}</td><td>${c.input}</td><td class="num">——</td>
-      <td>${c.output}</td><td class="num">——</td><td class="num">——</td>
-      <td class="num">——</td><td class="num">——</td><td class="num">——</td>
+      <td>${c.level}</td>
+      <td>${c.input}</td>
+      <td class="hist-cell"></td>
+      <td>${c.output}</td>
+      <td class="hist-cell"></td>
+      <td class="num">—</td>
+      <td class="num">—</td>
+      <td class="num">—</td>
+      <td class="num">—</td>
     </tr>`).join("");
 }
 
@@ -404,27 +564,37 @@ function renderTable() {
   if (!tableData.length) return;
 
   const sorted = [...tableData].sort((a, b) => {
-    const k = currentSort.key;
+    const k  = currentSort.key;
     const av = a[k] ?? (currentSort.asc ? Infinity : -Infinity);
     const bv = b[k] ?? (currentSort.asc ? Infinity : -Infinity);
-    if (typeof av === "string") return currentSort.asc ? av.localeCompare(bv) : bv.localeCompare(av);
-    return currentSort.asc ? av - bv : bv - av;
+    return typeof av === "string"
+      ? (currentSort.asc ? av.localeCompare(bv) : bv.localeCompare(av))
+      : (currentSort.asc ? av - bv : bv - av);
   });
 
   const tbody = document.getElementById("table-body");
   tbody.innerHTML = sorted.map(r => {
-    const spWide = r.spread !== null && r.spread > 5;
-    const spreadDisplay = r.spread !== null
+    const spWide  = r.spread != null && r.spread > 5;
+    const spTxt   = r.spread != null
       ? `<span class="spread${spWide ? " wide" : ""}">${r.spread.toFixed(1)}%</span>`
       : "—";
+
+    const inHist  = renderHistogram(r.inputSeries,  r.inputPrice);
+    const outHist = renderHistogram(r.outputSeries, r.outputPrice);
 
     return `<tr>
       <td><span class="lvl-badge">${r.level}</span></td>
       <td>${r.input}</td>
-      <td class="num">${fmt(r.inputPrice)}</td>
+      <td class="hist-cell">
+        <span class="price-label">${fmt(r.inputPrice)} gp</span>
+        ${inHist}
+      </td>
       <td>${r.output}</td>
-      <td class="num">${fmt(r.outputPrice)}</td>
-      <td class="num">${spreadDisplay}</td>
+      <td class="hist-cell">
+        <span class="price-label">${fmt(r.outputPrice)} gp</span>
+        ${outHist}
+      </td>
+      <td class="num">${spTxt}</td>
       <td class="num">${fmt(r.profit)}</td>
       <td class="num"><span class="gps ${gpsClass(r.gps)}">${fmt(r.gps)}</span></td>
       <td class="num"><span class="vol ${volClass(r.vol)}">${r.vol.toLocaleString()}</span></td>
@@ -432,7 +602,10 @@ function renderTable() {
   }).join("");
 }
 
-loadPrices();
+// ── Boot ──────────────────────────────────────────────────────────────────────
+setBarH(16);
+renderSkeleton();
+loadAll();
 </script>
 
 </body>
