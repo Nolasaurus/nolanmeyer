@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crystal Shard GP/Shard · Nolan Meyer</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --fg: #e8e8e8;
+    --accent: #c8f060;
+    --muted: #555;
+    --border: #222;
+    --warn: #f0b060;
+    --bad: #f06060;
+    --good: #60f0a0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 48px 48px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .name { font-size: 28px; font-weight: 500; letter-spacing: -0.5px; }
+  .name span { color: var(--accent); }
+  .name a { color: inherit; text-decoration: none; }
+
+  .links { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 8px; }
+  .links a {
+    color: var(--muted); text-decoration: none;
+    font-size: 12px; transition: color .15s;
+  }
+  .links a:hover { color: var(--accent); }
+
+  .header-right { text-align: right; font-size: 11px; color: var(--muted); }
+  .header-right .status { color: var(--accent); }
+  .header-right .status.loading { color: var(--warn); }
+  .header-right .status.error { color: var(--bad); }
+
+  main { padding: 48px; max-width: 1100px; }
+
+  .section-title {
+    font-size: 11px; letter-spacing: .15em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  /* ── refresh button ── */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  button.refresh {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  button.refresh:hover { border-color: var(--accent); color: var(--accent); }
+  button.refresh:disabled { opacity: .4; cursor: default; }
+
+  .sort-hint { font-size: 11px; color: var(--muted); }
+
+  /* ── table ── */
+  .table-wrap {
+    border: 1px solid var(--border);
+    overflow-x: auto;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead th {
+    font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); text-align: left; padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap; cursor: pointer; user-select: none;
+    transition: color .15s;
+  }
+  thead th:hover { color: var(--fg); }
+  thead th.sorted { color: var(--accent); }
+  thead th.sorted::after { content: " ▾"; }
+  thead th.sorted.asc::after { content: " ▴"; }
+  thead th.num { text-align: right; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .12s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #141414; }
+
+  td { padding: 14px 16px; white-space: nowrap; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .lvl-badge {
+    font-size: 10px; color: var(--muted); border: 1px solid var(--border);
+    padding: 1px 6px; margin-right: 6px;
+  }
+
+  .gps {
+    font-weight: 500;
+  }
+  .gps.high   { color: var(--good); }
+  .gps.mid    { color: var(--accent); }
+  .gps.low    { color: var(--muted); }
+
+  .vol {
+    font-size: 12px;
+  }
+  .vol.thin   { color: var(--bad); }
+  .vol.ok     { color: var(--warn); }
+  .vol.liquid { color: var(--good); }
+
+  .spread { font-size: 12px; color: var(--muted); }
+  .spread.wide { color: var(--warn); }
+
+  /* ── skeleton loader ── */
+  .skeleton td { color: transparent; background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%); background-size: 400% 100%; animation: shimmer 1.4s infinite; border-radius: 2px; }
+  @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+  .error-banner {
+    padding: 16px; border: 1px solid #3a2020;
+    color: var(--bad); font-size: 12px; margin-bottom: 24px;
+    display: none;
+  }
+  .error-banner.visible { display: block; }
+
+  .footnote {
+    font-size: 11px; color: var(--muted);
+    margin-top: 28px; line-height: 1.8;
+  }
+
+  @media (max-width: 600px) {
+    header, main { padding-left: 20px; padding-right: 20px; }
+    header { flex-direction: column; align-items: flex-start; }
+    .header-right { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="name"><a href="/">Nolan<span>.</span>Meyer</a></div>
+    <div class="links">
+      <a href="/">← home</a>
+      <a href="https://github.com/Nolasaurus/nolanmeyer" target="_blank">github</a>
+    </div>
+  </div>
+  <div class="header-right">
+    <div>crystal shard · gp/shard calculator</div>
+    <div>last updated: <span id="last-updated">—</span></div>
+    <div>status: <span id="status" class="status loading">loading…</span></div>
+  </div>
+</header>
+
+<main>
+  <div class="section-title">Divine Potion Conversions — Live Prices</div>
+
+  <div class="controls">
+    <button class="refresh" id="refresh-btn" onclick="loadPrices()">↻ refresh prices</button>
+    <span class="sort-hint">click any column header to sort</span>
+  </div>
+
+  <div class="error-banner" id="error-banner"></div>
+
+  <div class="table-wrap">
+    <table id="results-table">
+      <thead>
+        <tr>
+          <th onclick="sortBy('level')">Herb</th>
+          <th onclick="sortBy('input')">Input Potion</th>
+          <th onclick="sortBy('inputPrice')" class="num">In (gp)</th>
+          <th onclick="sortBy('output')">Output</th>
+          <th onclick="sortBy('outputPrice')" class="num">Out (gp)</th>
+          <th onclick="sortBy('spread')" class="num">Spread</th>
+          <th onclick="sortBy('profit')" class="num">Profit/pot</th>
+          <th onclick="sortBy('gps')" class="num sorted">GP/Shard</th>
+          <th onclick="sortBy('vol')" class="num">1h Vol ↑</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <!-- skeleton rows while loading -->
+        <tr class="skeleton"><td>70</td><td>Super attack(4)</td><td class="num">——</td><td>Divine super attack(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
+        <tr class="skeleton"><td>70</td><td>Super strength(4)</td><td class="num">——</td><td>Divine super strength(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
+        <tr class="skeleton"><td>70</td><td>Super defence(4)</td><td class="num">——</td><td>Divine super defence(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
+        <tr class="skeleton"><td>74</td><td>Ranging potion(4)</td><td class="num">——</td><td>Divine ranging potion(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
+        <tr class="skeleton"><td>78</td><td>Magic potion(4)</td><td class="num">——</td><td>Divine magic potion(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
+        <tr class="skeleton"><td>86</td><td>Bastion potion(4)</td><td class="num">——</td><td>Divine bastion potion(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
+        <tr class="skeleton"><td>86</td><td>Battlemage potion(4)</td><td class="num">——</td><td>Divine battlemage potion(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
+        <tr class="skeleton"><td>97</td><td>Super combat potion(4)</td><td class="num">——</td><td>Divine super combat potion(4)</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td><td class="num">——</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footnote">
+    Prices: mid of insta-buy/sell from <a href="https://prices.runescape.wiki" target="_blank" style="color:var(--muted)">prices.runescape.wiki</a>.
+    Volume: 1h trade count for output item. Shards per conversion: 0.4.
+    <br>
+    Vol flags: <span style="color:var(--bad)">red &lt; 50</span> · <span style="color:var(--warn)">amber 50–500</span> · <span style="color:var(--good)">green &gt; 500</span>.
+    Spread flag: <span style="color:var(--warn)">amber if (high−low)/mid &gt; 5%</span>.
+  </div>
+</main>
+
+<script>
+const CONVERSIONS = [
+  { level: 70,  input: "Super attack(4)",        inputId: 2436,  output: "Divine super attack(4)",       outputId: 23697, shards: 0.4 },
+  { level: 70,  input: "Super strength(4)",      inputId: 2440,  output: "Divine super strength(4)",     outputId: 23709, shards: 0.4 },
+  { level: 70,  input: "Super defence(4)",       inputId: 2442,  output: "Divine super defence(4)",      outputId: 23721, shards: 0.4 },
+  { level: 74,  input: "Ranging potion(4)",      inputId: 2444,  output: "Divine ranging potion(4)",     outputId: 23733, shards: 0.4 },
+  { level: 78,  input: "Magic potion(4)",        inputId: 3040,  output: "Divine magic potion(4)",       outputId: 23745, shards: 0.4 },
+  { level: 86,  input: "Bastion potion(4)",      inputId: 22461, output: "Divine bastion potion(4)",     outputId: 24635, shards: 0.4 },
+  { level: 86,  input: "Battlemage potion(4)",   inputId: 22443, output: "Divine battlemage potion(4)",  outputId: 24623, shards: 0.4 },
+  { level: 97,  input: "Super combat potion(4)", inputId: 12695, output: "Divine super combat potion(4)",outputId: 23685, shards: 0.4 },
+];
+
+const API = "https://prices.runescape.wiki/api/v1/osrs";
+const HEADERS = { "User-Agent": "crystal-shard-dashboard/1.0 (nolasaurus.github.io)" };
+const RATE_MS = 210; // ~4.7 req/s, safely under 5/s
+
+let currentSort = { key: "gps", asc: false };
+let tableData = [];
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function fetchWithDelay(url, delayBefore = 0) {
+  if (delayBefore) await sleep(delayBefore);
+  const r = await fetch(url, { headers: HEADERS });
+  if (!r.ok) throw new Error(`HTTP ${r.status} for ${url}`);
+  return r.json();
+}
+
+function mid(entry) {
+  const h = entry?.high ?? entry?.avgHighPrice ?? null;
+  const l = entry?.low  ?? entry?.avgLowPrice  ?? null;
+  if (h !== null && l !== null) return (h + l) / 2;
+  return h ?? l ?? null;
+}
+
+function spreadPct(entry) {
+  const h = entry?.high ?? null;
+  const l = entry?.low  ?? null;
+  if (h === null || l === null || h + l === 0) return null;
+  return (h - l) / ((h + l) / 2) * 100;
+}
+
+function fmt(n) {
+  if (n === null || n === undefined) return "—";
+  return Math.round(n).toLocaleString();
+}
+
+function gpsClass(gps) {
+  if (gps === null) return "";
+  if (gps >= 12000) return "high";
+  if (gps >= 6000)  return "mid";
+  return "low";
+}
+
+function volClass(vol) {
+  if (vol === null) return "";
+  if (vol < 50)   return "thin";
+  if (vol < 500)  return "ok";
+  return "liquid";
+}
+
+async function loadPrices() {
+  const btn = document.getElementById("refresh-btn");
+  const statusEl = document.getElementById("status");
+  const errorEl = document.getElementById("error-banner");
+
+  btn.disabled = true;
+  statusEl.textContent = "loading…";
+  statusEl.className = "status loading";
+  errorEl.classList.remove("visible");
+  renderSkeleton();
+
+  try {
+    const allIds = CONVERSIONS.flatMap(c => [c.inputId, c.outputId]);
+    const prices = {};
+    const volumes = {};
+
+    // latest prices — sequential to respect rate limit
+    for (let i = 0; i < allIds.length; i++) {
+      const id = allIds[i];
+      const delay = i === 0 ? 0 : RATE_MS;
+      const json = await fetchWithDelay(`${API}/latest?id=${id}`, delay);
+      prices[id] = json.data?.[String(id)] ?? {};
+    }
+
+    // 1h volumes — sequential
+    for (let i = 0; i < allIds.length; i++) {
+      const id = allIds[i];
+      const json = await fetchWithDelay(`${API}/1h?id=${id}`, RATE_MS);
+      volumes[id] = json.data?.[String(id)] ?? {};
+    }
+
+    tableData = CONVERSIONS.map(c => {
+      const inP  = prices[c.inputId]  ?? {};
+      const outP = prices[c.outputId] ?? {};
+      const outV = volumes[c.outputId] ?? {};
+
+      const inMid  = mid(inP);
+      const outMid = mid(outP);
+      const profit = (inMid !== null && outMid !== null) ? outMid - inMid : null;
+      const gps    = profit !== null ? profit / c.shards : null;
+      const vol    = (outV.highPriceVolume ?? 0) + (outV.lowPriceVolume ?? 0);
+      const sp     = spreadPct(outP);
+
+      return {
+        level: c.level,
+        input: c.input,
+        inputPrice: inMid,
+        inputHigh: inP.high ?? null,
+        inputLow:  inP.low  ?? null,
+        output: c.output,
+        outputPrice: outMid,
+        outputHigh: outP.high ?? null,
+        outputLow:  outP.low  ?? null,
+        shards: c.shards,
+        profit,
+        gps,
+        vol,
+        spread: sp,
+      };
+    });
+
+    renderTable();
+    statusEl.textContent = "live";
+    statusEl.className = "status";
+    document.getElementById("last-updated").textContent = new Date().toLocaleTimeString();
+
+  } catch (err) {
+    statusEl.textContent = "error";
+    statusEl.className = "status error";
+    errorEl.textContent = "Failed to fetch prices: " + err.message;
+    errorEl.classList.add("visible");
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function sortBy(key) {
+  if (currentSort.key === key) {
+    currentSort.asc = !currentSort.asc;
+  } else {
+    currentSort.key = key;
+    currentSort.asc = key === "level" || key === "input" || key === "output";
+  }
+  updateSortHeaders();
+  renderTable();
+}
+
+function updateSortHeaders() {
+  const keyMap = {
+    level: 0, input: 1, inputPrice: 2, output: 3,
+    outputPrice: 4, spread: 5, profit: 6, gps: 7, vol: 8
+  };
+  document.querySelectorAll("thead th").forEach((th, i) => {
+    th.classList.remove("sorted", "asc");
+    if (i === keyMap[currentSort.key]) {
+      th.classList.add("sorted");
+      if (currentSort.asc) th.classList.add("asc");
+    }
+  });
+}
+
+function renderSkeleton() {
+  const tbody = document.getElementById("table-body");
+  tbody.innerHTML = CONVERSIONS.map(c => `
+    <tr class="skeleton">
+      <td>${c.level}</td><td>${c.input}</td><td class="num">——</td>
+      <td>${c.output}</td><td class="num">——</td><td class="num">——</td>
+      <td class="num">——</td><td class="num">——</td><td class="num">——</td>
+    </tr>`).join("");
+}
+
+function renderTable() {
+  if (!tableData.length) return;
+
+  const sorted = [...tableData].sort((a, b) => {
+    const k = currentSort.key;
+    const av = a[k] ?? (currentSort.asc ? Infinity : -Infinity);
+    const bv = b[k] ?? (currentSort.asc ? Infinity : -Infinity);
+    if (typeof av === "string") return currentSort.asc ? av.localeCompare(bv) : bv.localeCompare(av);
+    return currentSort.asc ? av - bv : bv - av;
+  });
+
+  const tbody = document.getElementById("table-body");
+  tbody.innerHTML = sorted.map(r => {
+    const spWide = r.spread !== null && r.spread > 5;
+    const spreadDisplay = r.spread !== null
+      ? `<span class="spread${spWide ? " wide" : ""}">${r.spread.toFixed(1)}%</span>`
+      : "—";
+
+    return `<tr>
+      <td><span class="lvl-badge">${r.level}</span></td>
+      <td>${r.input}</td>
+      <td class="num">${fmt(r.inputPrice)}</td>
+      <td>${r.output}</td>
+      <td class="num">${fmt(r.outputPrice)}</td>
+      <td class="num">${spreadDisplay}</td>
+      <td class="num">${fmt(r.profit)}</td>
+      <td class="num"><span class="gps ${gpsClass(r.gps)}">${fmt(r.gps)}</span></td>
+      <td class="num"><span class="vol ${volClass(r.vol)}">${r.vol.toLocaleString()}</span></td>
+    </tr>`;
+  }).join("");
+}
+
+loadPrices();
+</script>
+
+</body>
+</html>
