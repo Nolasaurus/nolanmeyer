@@ -283,7 +283,8 @@
 
   <div class="footnote">
     Prices: mid of insta-buy/sell from <a href="https://prices.runescape.wiki" target="_blank">prices.runescape.wiki</a>.
-    Histograms: daily high/low range over last 7 days (oldest top → newest bottom). Dashed line = current mid price.
+    Histograms: daily high/low range over last 7 days (oldest top → newest bottom).
+    Dashed line = current mid price (always centered). Shaded band = middle 80% of 7-day prices (p10–p90).
     Volume: 1h trade count on output item.
     Shards per conversion: 0.4.
     <br>
@@ -355,7 +356,7 @@ function spreadPct(e) {
 
 // ── Histogram renderer ───────────────────────────────────────────────────────
 // series: [{avgHighPrice, avgLowPrice, timestamp}, ...] last 7 days oldest→newest
-// currentMid: current live mid price (drawn as dashed vertical line)
+// currentMid: current live mid price (dashed vertical line, always centered)
 function renderHistogram(series, currentMid) {
   if (!series || !series.length) {
     return `<span style="color:var(--muted);font-size:11px">no data</span>`;
@@ -365,58 +366,74 @@ function renderHistogram(series, currentMid) {
   const allP = days.flatMap(d => [d.avgHighPrice, d.avgLowPrice].filter(v => v != null));
   if (!allP.length) return `<span style="color:var(--muted);font-size:11px">no data</span>`;
 
-  // include current mid in the x-scale so the dashed line is never clipped
-  const allPlusMid = currentMid != null ? [...allP, currentMid] : allP;
-  const minP = Math.min(...allPlusMid);
-  const maxP = Math.max(...allPlusMid);
-  const span = maxP - minP || 1;
+  // x-axis: symmetric around currentMid so the mid line is always centered.
+  // If no currentMid, fall back to data range centered on its own midpoint.
+  const anchor = currentMid ?? (Math.min(...allP) + Math.max(...allP)) / 2;
+  const maxDist = Math.max(...allP.map(p => Math.abs(p - anchor))) || 1;
+  const minP = anchor - maxDist;
+  const maxP = anchor + maxDist;
+  const span = maxP - minP;
 
-  const gap     = 2;
-  const bh      = barH;           // bar height in px
-  const rowH    = bh + gap;       // row pitch
-  const totalH  = days.length * rowH - gap;
-  const W       = 200;            // SVG logical width
-  const PAD_L   = 2;
-  const PAD_R   = 2;
-  const innerW  = W - PAD_L - PAD_R;
+  const gap    = 2;
+  const bh     = barH;                     // bar height in px
+  const rowH   = bh + gap;                 // row pitch
+  const PAD_V  = bh;                       // vertical padding above/below bars = 1 bar
+  const barsH  = days.length * rowH - gap; // height of bar area
+  const totalH = PAD_V + barsH + PAD_V;
+  const W      = 200;                      // SVG logical width (scales with CSS)
+  const PAD_H  = 1;                        // minimal horizontal clip guard
+  const innerW = W - PAD_H * 2;
 
-  const sx = p => PAD_L + ((p - minP) / span) * innerW;
+  const sx = p => PAD_H + ((p - minP) / span) * innerW;
 
-  // bars: oldest at top (index 0), newest at bottom
+  // 10th/90th percentile band — 10% opacity fill
+  const sorted = [...allP].sort((a, b) => a - b);
+  function pct(arr, p) {
+    const idx = (p / 100) * (arr.length - 1);
+    const lo  = Math.floor(idx), hi = Math.ceil(idx);
+    return arr[lo] + (arr[hi] - arr[lo]) * (idx - lo);
+  }
+  const p10 = pct(sorted, 10);
+  const p90 = pct(sorted, 90);
+  const bandX = sx(p10);
+  const bandW = Math.max(sx(p90) - bandX, 1);
+  const band  = `<rect x="${bandX.toFixed(1)}" y="0" width="${bandW.toFixed(1)}" height="${totalH}"
+    fill="var(--accent)" opacity="0.10">
+    <title>middle 80% range: ${Math.round(p10).toLocaleString()} – ${Math.round(p90).toLocaleString()}</title>
+  </rect>`;
+
+  // bars: oldest at top (index 0), newest at bottom — all 100% opacity
   const bars = days.map((d, i) => {
-    const hi  = d.avgHighPrice ?? null;
-    const lo  = d.avgLowPrice  ?? null;
+    const hi = d.avgHighPrice ?? null;
+    const lo = d.avgLowPrice  ?? null;
     if (hi === null && lo === null) return "";
 
-    const x1  = sx(lo ?? hi);
-    const x2  = sx(hi ?? lo);
-    const y   = i * rowH;
-    const w   = Math.max(x2 - x1, 1);
-    const opacity = 0.45 + (i / Math.max(days.length - 1, 1)) * 0.45; // fade older bars
+    const x1 = sx(lo ?? hi);
+    const x2 = sx(hi ?? lo);
+    const y  = PAD_V + i * rowH;
+    const w  = Math.max(x2 - x1, 1);
 
-    // tooltip
     const loFmt = lo != null ? lo.toLocaleString() : "—";
     const hiFmt = hi != null ? hi.toLocaleString() : "—";
-    const ts    = d.timestamp ? new Date(d.timestamp * 1000).toLocaleDateString(undefined, {month:"short",day:"numeric"}) : "";
-    const title = `${ts}: low ${loFmt} / high ${hiFmt}`;
+    const ts    = d.timestamp
+      ? new Date(d.timestamp * 1000).toLocaleDateString(undefined, {month:"short", day:"numeric"})
+      : "";
 
     return `<rect x="${x1.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="${bh}"
-      fill="var(--accent)" opacity="${opacity.toFixed(2)}" rx="1">
-      <title>${title}</title></rect>`;
+      fill="var(--accent)" opacity="1" rx="1">
+      <title>${ts}: low ${loFmt} / high ${hiFmt}</title></rect>`;
   }).join("\n");
 
-  // current mid price — dashed vertical line
-  const midLine = currentMid != null
-    ? `<line x1="${sx(currentMid).toFixed(1)}" y1="0"
-              x2="${sx(currentMid).toFixed(1)}" y2="${totalH}"
-              stroke="var(--fg)" stroke-width="1"
-              stroke-dasharray="2,2" opacity="0.7">
-         <title>current mid: ${Math.round(currentMid).toLocaleString()}</title>
-       </line>`
-    : "";
+  // current mid price — dashed vertical line spanning full SVG height
+  const midX   = sx(anchor).toFixed(1);
+  const midLine = `<line x1="${midX}" y1="0" x2="${midX}" y2="${totalH}"
+    stroke="var(--fg)" stroke-width="1" stroke-dasharray="2,2" opacity="0.7">
+    <title>current mid: ${Math.round(anchor).toLocaleString()}</title>
+  </line>`;
 
   return `<svg class="hist-svg" viewBox="0 0 ${W} ${totalH}"
     height="${totalH}" style="width:100%;min-width:80px">
+    ${band}
     ${bars}
     ${midLine}
   </svg>`;
